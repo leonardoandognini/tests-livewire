@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Livewire\ShowComments;
+use  App\Http\Livewire\User\UploadPhoto;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,9 +14,15 @@ use App\Http\Livewire\ShowComments;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('comments', ShowComments::class);
+Route::get('/upload', UploadPhoto::class)->name('upload.photo.user')->middleware('auth');;
+Route::get('comments', ShowComments::class)
+    ->name('comments.index')
+    ->middleware('auth');
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');

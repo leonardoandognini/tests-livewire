@@ -4,9 +4,12 @@ namespace App\Http\Livewire;
 
 use App\Models\Comment;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class ShowComments extends Component
 {
+
+    use WithPagination;
 
     public $content = 'test';
 
@@ -14,9 +17,9 @@ class ShowComments extends Component
         'content' => 'required|min:3|max:255'
     ];
 
-    public function render()   
+    public function render()
     {
-        $comments = Comment::with('user')->get();
+        $comments = Comment::with('user')->latest()->paginate(2);
 
         return view('livewire.show-comments', [
             'comments' => $comments
@@ -28,11 +31,25 @@ class ShowComments extends Component
 
         $this->validate();
 
-        Comment::create([
+        auth()->user()->comments()->create([
             'content' => $this->content,
-            'user_id' => 2
+
         ]);
+
         $this->content = '';
+    }
+
+    public function like($idComment)
+    {
+        $comment = Comment::find($idComment);
+        $comment->likes()->create([
+            'user_id' => auth()->user()->id
+        ]);
+    }
+
+    public function unlike(Comment  $comment)
+    {
+        $comment->likes()->delete();
     }
 
 }
